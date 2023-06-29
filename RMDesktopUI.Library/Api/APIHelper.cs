@@ -1,4 +1,4 @@
-﻿using RMDesktopUI.Models;
+﻿using RMDesktopUI.Library.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -6,15 +6,17 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace RMDesktopUI.Helpers
+namespace RMDesktopUI.Library.Api
 {
     public class APIHelper : IAPIHelper
     {
         private HttpClient apiClient { get; set; }
+        private ILoggedInUserModel loggedInUser { get; set; }
 
-        public APIHelper()
+        public APIHelper(ILoggedInUserModel loggedInUser)
         {
             InitalizeClient();
+            this.loggedInUser = loggedInUser;
         }
 
         private void InitalizeClient()
@@ -43,6 +45,33 @@ namespace RMDesktopUI.Helpers
                     var result = await response.Content.ReadAsAsync<AuthenticatedUser>();
 
                     return result;
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
+        public async Task GetLoggedInUserInfo(string token)
+        {
+            apiClient.DefaultRequestHeaders.Clear();
+            apiClient.DefaultRequestHeaders.Accept.Clear();
+            apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            using (HttpResponseMessage response = await apiClient.GetAsync("/api/User"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsAsync<LoggedInUserModel>();
+
+                    this.loggedInUser.EmailAddress = result.EmailAddress;
+                    this.loggedInUser.CreatedDate = result.CreatedDate;
+                    this.loggedInUser.FirstName = result.FirstName;
+                    this.loggedInUser.LastName = result.LastName;
+                    this.loggedInUser.Id = result.Id;
+                    this.loggedInUser.Token = token;
                 }
                 else
                 {
