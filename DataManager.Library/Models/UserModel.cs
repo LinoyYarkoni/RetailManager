@@ -1,4 +1,6 @@
-﻿namespace DataManager.Library.Models
+﻿using System;
+
+namespace DataManager.Library.Models
 {
     public class UserModel
     {
@@ -10,6 +12,6 @@
 
         public string EmailAddress { get; set; }
 
-        public string CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }
