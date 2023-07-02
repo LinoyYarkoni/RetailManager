@@ -32,9 +32,15 @@
         <!-- Column 0 -->
         <TextBlock Text="Items" Grid.Column="0" Grid.Row="1"/>
         <ListBox x:Name="Products" Grid.Column="0" Grid.Row="2"
-                 MinHeight="200" MinWidth="150"/>
+                 MinHeight="200" MinWidth="150">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ProductName}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
-        <!-- Column 1 -->
+            <!-- Column 1 -->
         <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="2"
                     Margin="20 0 20 20 ">
             <TextBlock Text="Quantity"/>
