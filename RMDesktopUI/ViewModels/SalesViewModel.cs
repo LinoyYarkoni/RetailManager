@@ -2,6 +2,7 @@
 using RMDesktopUI.Library.Api;
 using RMDesktopUI.Library.Models;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RMDesktopUI.ViewModels
@@ -9,16 +10,31 @@ namespace RMDesktopUI.ViewModels
     public class SalesViewModel : Screen
     {
 		private BindingList<ProductModel> _products;
-		private int _itemQuantity;
-        private BindingList<ProductModel> _cart;
+		private int _itemQuantity = 1;
+        private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
         private IProductEndpoint _productEndpoint;
+        private ProductModel _selectedProduct;
 
         public SalesViewModel(IProductEndpoint productEndpoint)
         {
             _productEndpoint = productEndpoint;
         }
 
-        public BindingList<ProductModel> Cart
+        public ProductModel SelectedProduct
+        {
+            get
+            { 
+                return _selectedProduct;
+            }
+            set 
+            {
+                _selectedProduct = value;
+                NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanAddToCart);
+            }
+        }
+
+        public BindingList<CartItemModel> Cart
         {
             get 
             {
@@ -54,6 +70,7 @@ namespace RMDesktopUI.ViewModels
 			{
 				_itemQuantity = value;
                 NotifyOfPropertyChange(() => ItemQuantity);
+                NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
@@ -63,8 +80,10 @@ namespace RMDesktopUI.ViewModels
             {
                 bool result = false;
 
-                // Make sure something is selected
-                // Make sure there is item quantity
+                if(ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity)
+                {
+                    result = true;
+                }
 
                 return result;
             }
@@ -114,21 +133,46 @@ namespace RMDesktopUI.ViewModels
 
         public void AddToCart()
         {
+            CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
 
+            if (existingItem != null) 
+            {
+                existingItem.QuantityInCart += ItemQuantity;
+                Cart.Remove(existingItem);
+                Cart.Add(existingItem);
+            }
+            else
+            {
+                CartItemModel item = new CartItemModel
+                {
+                    Product = SelectedProduct,
+                    QuantityInCart = ItemQuantity
+                };
+                Cart.Add(item);
+            }
+
+            SelectedProduct.QuantityInStock -= ItemQuantity;
+            ItemQuantity = 1;
+            NotifyOfPropertyChange(() => SubTotal);
         }
 
         public void RemoveFromCart()
         {
-
+            NotifyOfPropertyChange(() => SubTotal);
         }
 
         public string SubTotal
         {
             get
             {
-                // Replace with calculation
+                decimal subTotal = 0;
+                
+                foreach(var item in Cart)
+                {
+                    subTotal += item.Product.RetailPrice * item.QuantityInCart;
+                }
 
-                return "$0.00";
+                return subTotal.ToString("C");
             }
         }
 
