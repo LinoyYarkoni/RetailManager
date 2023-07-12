@@ -9,15 +9,19 @@ namespace RMDesktopUI.ViewModels
     {
         private SalesViewModel _salesViewModel;
         private IEventAggregator _events;
+        private SimpleContainer _container;
 
-        public ShellViewModel(IEventAggregator events, SalesViewModel salesViewModel)
+        public ShellViewModel(IEventAggregator events, SalesViewModel salesViewModel,
+            SimpleContainer container)
         {
             _events = events;
             _events.Subscribe(this);
 
             _salesViewModel = salesViewModel;
 
-            ActivateItemAsync(IoC.Get<LoginViewModel>());
+            _container = container;
+
+            ActivateItemAsync(_container.GetInstance<LoginViewModel>());
         }
 
         public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
