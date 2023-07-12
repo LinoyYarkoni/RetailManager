@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RMDesktopUI.Library.Models
+﻿namespace RMDesktopUI.Library.Models
 {
     public class ProductModel
     {
@@ -17,5 +11,7 @@ namespace RMDesktopUI.Library.Models
         public decimal RetailPrice { get; set; }
 
         public int QuantityInStock { get; set; }
+
+        public bool IsTaxable { get; set; }
     }
 }
