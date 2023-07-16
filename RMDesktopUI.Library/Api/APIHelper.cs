@@ -37,7 +37,7 @@ namespace RMDesktopUI.Library.Api
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<AuthenticatedUser> Authenticate(string username, string password)
+        public async Task<AuthenticatedUserModel> Authenticate(string username, string password)
         {
             var data = new FormUrlEncodedContent(new[]
             {
@@ -50,7 +50,7 @@ namespace RMDesktopUI.Library.Api
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadAsAsync<AuthenticatedUser>();
+                    var result = await response.Content.ReadAsAsync<AuthenticatedUserModel>();
 
                     return result;
                 }

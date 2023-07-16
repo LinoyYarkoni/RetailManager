@@ -1,6 +1,6 @@
 ﻿namespace RMDesktopUI.Library.Models
 {
-    public class AuthenticatedUser
+    public class AuthenticatedUserModel
     {
         public string Access_Token { get; set; }
 

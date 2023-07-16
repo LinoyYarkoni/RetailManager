@@ -217,6 +217,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
+    <Compile Include="Controllers\SaleController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
@@ -323,6 +324,10 @@
     <ProjectReference Include="..\DataManager.Library\DataManager.Library.csproj">
       <Project>{B3CAD732-2A2C-4654-B6FC-A959EE05149E}</Project>
       <Name>DataManager.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RMDesktopUI.Library\RMDesktopUI.Library.csproj">
+      <Project>{6E66D583-3DB9-4D87-A1DE-1C6907A391E0}</Project>
+      <Name>RMDesktopUI.Library</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

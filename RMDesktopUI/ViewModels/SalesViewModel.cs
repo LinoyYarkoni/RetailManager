@@ -10,30 +10,31 @@ namespace RMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
-		private BindingList<ProductModel> _products;
-		private int _itemQuantity = 1;
-        private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
-        private IProductEndpoint _productEndpoint;
-        private ProductModel _selectedProduct;
         private IConfigHelper _configHelper;
+        private IProductEndpoint _productEndpoint;
+        private ISaleEndpoint _saleEndpoint;
+        private BindingList<ProductModel> _products;
+        private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
+        private ProductModel _selectedProduct;
+        private int _itemQuantity = 1;
 
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint)
         {
             _productEndpoint = productEndpoint;
             _configHelper = configHelper;
+            _saleEndpoint = saleEndpoint;
         }
 
-        public ProductModel SelectedProduct
+        public BindingList<ProductModel> Products
         {
             get
-            { 
-                return _selectedProduct;
-            }
-            set 
             {
-                _selectedProduct = value;
-                NotifyOfPropertyChange(() => SelectedProduct);
-                NotifyOfPropertyChange(() => CanAddToCart);
+                return _products;
+            }
+            set
+            {
+                _products = value;
+                NotifyOfPropertyChange(() => Products);
             }
         }
 
@@ -50,16 +51,17 @@ namespace RMDesktopUI.ViewModels
             }
         }
 
-        public BindingList<ProductModel> Products
+        public ProductModel SelectedProduct
         {
             get
             {
-                return _products;
+                return _selectedProduct;
             }
             set
             {
-                _products = value;
-                NotifyOfPropertyChange(() => Products);
+                _selectedProduct = value;
+                NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
@@ -110,35 +112,20 @@ namespace RMDesktopUI.ViewModels
             {
                 bool result = false;
 
-                // Make sure something is in the cart
+                if(Cart.Count > 0)
+                {
+                    result = true;
+                }
 
                 return result;
             }
-        }
-
-        protected override async void OnViewLoaded(object view)
-        {
-            base.OnViewLoaded(view);
-
-            await loadProducts();
-        }
-
-        private async Task loadProducts()
-        {
-            var prods = await _productEndpoint.GetAll();
-            Products = new BindingList<ProductModel>(prods);
-        }
-
-        public void CheckOut()
-        {
-
         }
 
         public void AddToCart()
         {
             CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
 
-            if (existingItem != null) 
+            if (existingItem != null)
             {
                 existingItem.QuantityInCart += ItemQuantity;
                 Cart.Remove(existingItem);
@@ -159,7 +146,7 @@ namespace RMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
-
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         public void RemoveFromCart()
@@ -167,6 +154,23 @@ namespace RMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
+        }
+
+        public async Task CheckOut()
+        {
+            SaleModel sale = new SaleModel();
+
+            foreach (var item in Cart)
+            {
+                sale.SaleDetail.Add(new SaleDetailModel
+                {
+                    ProductId = item.Product.Id,
+                    Quantity = item.QuantityInCart
+                });
+            }
+
+            await _saleEndpoint.PostSale(sale);
         }
 
         public string SubTotal
@@ -175,6 +179,37 @@ namespace RMDesktopUI.ViewModels
             {
                 return calculateSubTotal().ToString("C");
             }
+        }
+
+        public string Tax
+        {
+            get
+            {
+                return calculateTax().ToString("C");
+            }
+        }
+
+        public string Total
+        {
+            get
+            {
+                decimal total = calculateSubTotal() + calculateTax();
+
+                return total.ToString("C");
+            }
+        }
+
+        protected override async void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+
+            await loadProducts();
+        }
+
+        private async Task loadProducts()
+        {
+            var prods = await _productEndpoint.GetAll();
+            Products = new BindingList<ProductModel>(prods);
         }
 
         private decimal calculateSubTotal()
@@ -189,14 +224,6 @@ namespace RMDesktopUI.ViewModels
             return subTotal;
         }
 
-        public string Tax
-        {
-            get
-            {
-                return calculateTax().ToString("C");
-            }
-        }
-
         private decimal calculateTax()
         {
             decimal taxAmount = 0;
@@ -207,16 +234,6 @@ namespace RMDesktopUI.ViewModels
                 .Sum(x => x.Product.RetailPrice * x.QuantityInCart * taxRate);
 
             return taxAmount;
-        }
-
-        public string Total
-        {
-            get
-            {
-                decimal total = calculateSubTotal() + calculateTax();
-
-                return total.ToString("C");
-            }
         }
     }
 }
