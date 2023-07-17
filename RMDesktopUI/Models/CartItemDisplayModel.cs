@@ -4,9 +4,9 @@ namespace RMDesktopUI.Models
 {
     public class CartItemDisplayModel : INotifyPropertyChanged
     {
-        private int _quantityInCart;
-
         public ProductDisplayModel Product { get; set; }
+
+        private int _quantityInCart;
 
         public int QuantityInCart 
         { 
