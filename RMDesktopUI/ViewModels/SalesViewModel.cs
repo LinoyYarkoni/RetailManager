@@ -35,6 +35,13 @@ namespace RMDesktopUI.ViewModels
             _mapper = mapper;
         }
 
+        protected override async void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+
+            await loadProducts();
+        }
+
         public BindingList<ProductDisplayModel> Products
         {
             get
@@ -124,7 +131,7 @@ namespace RMDesktopUI.ViewModels
             {
                 bool result = false;
 
-                if (SelectedCartItem != null)
+                if (SelectedCartItem != null && SelectedCartItem?.QuantityInCart > 0)
                 {
                     result = true;
                 }
@@ -191,6 +198,7 @@ namespace RMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => CanCheckOut);
+            NotifyOfPropertyChange(() => CanAddToCart);
         }
 
         public async Task CheckOut()
@@ -207,6 +215,7 @@ namespace RMDesktopUI.ViewModels
             }
 
             await _saleEndpoint.PostSale(sale);
+            await resetSalesViewModel();
         }
 
         public string SubTotal
@@ -233,13 +242,6 @@ namespace RMDesktopUI.ViewModels
 
                 return total.ToString("C");
             }
-        }
-
-        protected override async void OnViewLoaded(object view)
-        {
-            base.OnViewLoaded(view);
-
-            await loadProducts();
         }
 
         private async Task loadProducts()
@@ -272,6 +274,18 @@ namespace RMDesktopUI.ViewModels
                 .Sum(x => x.Product.RetailPrice * x.QuantityInCart * taxRate);
 
             return taxAmount;
+        }
+
+        private async Task resetSalesViewModel()
+        {
+            Cart = new BindingList<CartItemDisplayModel>();
+
+            await loadProducts();
+
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
     }
 }
