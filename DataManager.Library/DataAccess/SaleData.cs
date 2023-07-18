@@ -55,21 +55,37 @@ namespace DataManager.Library.DataAccess
             // Initialize Sale DB model from SaleDetailDBModel model (Total) 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            // Save Sale to the DB (and get sale Id)
-            SqlDataAccess sql = new SqlDataAccess();
-            sql.SaveData<SaleDBModel>("dbo.spSaleInsert", sale, "RMData");
-
-            var input = new { CashierId = sale.CashierId, SaleDate = sale.SaleDate };
-
-            sale.Id = sql.LoadData<int, dynamic>("dbo.spSaleLookup", input, "RMData").FirstOrDefault();
-
-            // Update the Id in every SaleDetail record
-            foreach (var item in saleDetailDBModel)
+            /* Transaction */
+            using(SqlDataAccess sql = new SqlDataAccess())
             {
-                item.SaleId = sale.Id;
+                try
+                {
+                    sql.StartTransaction("RMData");
 
-                // Save SaleDetail to the DB
-                sql.SaveData<SaleDetailDBModel>("dbo.spSaleDetailInsert", item, "RMData");
+                    // Save Sale to the DB
+                    sql.SaveDataInTransaction("dbo.spSaleInsert", sale);
+
+                    // Get Sale Id
+                    var input = new { CashierId = sale.CashierId, SaleDate = sale.SaleDate };
+
+                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("dbo.spSaleLookup", input).FirstOrDefault();
+
+                    // Update the Id in every SaleDetail record
+                    foreach (var item in saleDetailDBModel)
+                    {
+                        item.SaleId = sale.Id;
+
+                        // Save SaleDetail to the DB
+                        sql.SaveDataInTransaction<SaleDetailDBModel>("dbo.spSaleDetailInsert", item);
+                    }
+
+                    // sql.CommitTransaction();
+                }
+                catch
+                {
+                    sql.RollbackTransaction();
+                    throw;
+                }
             }
         }
     }
