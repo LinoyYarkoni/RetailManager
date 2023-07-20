@@ -79,7 +79,7 @@ namespace DataManager.Library.DataAccess
                         sql.SaveDataInTransaction<SaleDetailDBModel>("dbo.spSaleDetailInsert", item);
                     }
 
-                    // sql.CommitTransaction();
+                    sql.CommitTransaction();
                 }
                 catch
                 {
