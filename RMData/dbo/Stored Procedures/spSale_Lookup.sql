@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[spSaleLookup]
+﻿CREATE PROCEDURE [dbo].[spSale_Lookup]
 	@CashierId nvarchar(128),
 	@SaleDate datetime2
 AS

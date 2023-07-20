@@ -71,12 +71,12 @@
     <Build Include="dbo\Tables\SaleDetail.sql" />
     <Build Include="dbo\Tables\Product.sql" />
     <Build Include="dbo\Tables\Inventory.sql" />
-    <Build Include="dbo\Stored Procedures\spUserLookup.sql" />
-    <Build Include="dbo\Stored Procedures\spProductGetAll.sql" />
-    <Build Include="dbo\Stored Procedures\spProductGetById.sql" />
-    <Build Include="dbo\Stored Procedures\spSaleInsert.sql" />
-    <Build Include="dbo\Stored Procedures\spSaleDetailInsert.sql" />
-    <Build Include="dbo\Stored Procedures\spSaleLookup.sql" />
+    <Build Include="dbo\Stored Procedures\spUser_Lookup.sql" />
+    <Build Include="dbo\Stored Procedures\spProduct_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spProduct_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\spSale_Insert.sql" />
+    <Build Include="dbo\Stored Procedures\spSale_DetailInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spSale_Lookup.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="RMData.refactorlog" />

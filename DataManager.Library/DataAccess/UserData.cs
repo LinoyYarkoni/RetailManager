@@ -11,7 +11,7 @@ namespace DataManager.Library.DataAccess
             SqlDataAccess sql = new SqlDataAccess();
             var parameters = new { Id = id };
 
-            var output = sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", parameters, "RMData");
+            var output = sql.LoadData<UserModel, dynamic>("dbo.spUser_Lookup", parameters, "RMData");
 
             return output;
         }

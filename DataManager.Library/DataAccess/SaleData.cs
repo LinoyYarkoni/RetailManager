@@ -63,12 +63,12 @@ namespace DataManager.Library.DataAccess
                     sql.StartTransaction("RMData");
 
                     // Save Sale to the DB
-                    sql.SaveDataInTransaction("dbo.spSaleInsert", sale);
+                    sql.SaveDataInTransaction("dbo.spSale_Insert", sale);
 
                     // Get Sale Id
                     var input = new { CashierId = sale.CashierId, SaleDate = sale.SaleDate };
 
-                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("dbo.spSaleLookup", input).FirstOrDefault();
+                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("dbo.spSale_Lookup", input).FirstOrDefault();
 
                     // Update the Id in every SaleDetail record
                     foreach (var item in saleDetailDBModel)
@@ -76,7 +76,7 @@ namespace DataManager.Library.DataAccess
                         item.SaleId = sale.Id;
 
                         // Save SaleDetail to the DB
-                        sql.SaveDataInTransaction<SaleDetailDBModel>("dbo.spSaleDetailInsert", item);
+                        sql.SaveDataInTransaction<SaleDetailDBModel>("dbo.spSale_DetailInsert", item);
                     }
 
                     sql.CommitTransaction();

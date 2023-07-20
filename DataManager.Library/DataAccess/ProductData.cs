@@ -11,7 +11,7 @@ namespace DataManager.Library.DataAccess
         {
             SqlDataAccess sql = new SqlDataAccess();
 
-            var output = sql.LoadData<ProductModel, dynamic>("dbo.spProductGetAll", new { }, "RMData");
+            var output = sql.LoadData<ProductModel, dynamic>("dbo.spProduct_GetAll", new { }, "RMData");
 
             return output;
         }
@@ -22,7 +22,7 @@ namespace DataManager.Library.DataAccess
 
             var output = 
                 sql
-                .LoadData<ProductModel, dynamic>("dbo.spProductGetById", new {id = productId}, "RMData")
+                .LoadData<ProductModel, dynamic>("dbo.spProduct_GetById", new {id = productId}, "RMData")
                 .FirstOrDefault();
 
             return output;
