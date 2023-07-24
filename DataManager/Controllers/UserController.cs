@@ -12,7 +12,7 @@ namespace DataManager.Controllers
     [Authorize]
     public class UserController : ApiController
     {
-        List<ApplicationUserModel> output = new List<ApplicationUserModel>();
+        private List<ApplicationUserModel> _output = new List<ApplicationUserModel>();
 
         [HttpGet]
         public UserModel GetById()
@@ -48,11 +48,53 @@ namespace DataManager.Controllers
                         u.Roles.Add(role.RoleId, roles.Where(x => x.Id == role.RoleId).First().Name);
                     }
 
-                    output.Add(u);
+                    _output.Add(u);
                 }
             }
 
-            return output;
+            return _output;
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Route("api/User/Admin/GetAllRoles")]
+        public Dictionary<string, string> GetAllRoles()
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var roles = context.Roles.ToDictionary(x => x.Id, x=> x.Name);
+
+                return roles;
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [Route("api/User/Admin/AddRole")]
+        public void AddRole(UserRolePairModel pairModel)
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var userStore = new UserStore<ApplicationUser>(context);
+                var userManager = new UserManager<ApplicationUser>(userStore);
+
+                userManager.AddToRole(pairModel.UserId, pairModel.RoleName);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [Route("api/User/Admin/RemoveRole")]
+        public void RemoveRole(UserRolePairModel pairModel)
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var userStore = new UserStore<ApplicationUser>(context);
+                var userManager = new UserManager<ApplicationUser>(userStore);
+
+                userManager.RemoveFromRole(pairModel.UserId, pairModel.RoleName);
+            }
+        }
+
     }
 }
