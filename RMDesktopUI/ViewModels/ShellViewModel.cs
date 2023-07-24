@@ -30,6 +30,14 @@ namespace RMDesktopUI.ViewModels
             ActivateItemAsync(IoC.Get<LoginViewModel>());
         }
 
+        public bool IsLoggedIn
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(_loggedInUserModel.Token);           
+            }
+        }        
+        
         public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
         {
             await ActivateItemAsync(_salesViewModel);
@@ -45,17 +53,14 @@ namespace RMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
 
+        public void UsersManagement()
+        {
+            ActivateItemAsync(IoC.Get<UserDisplayViewModel>());
+        }
+
         public async Task ExitApplication()
         {
             await TryCloseAsync();
-        }
-
-        public bool IsLoggedIn
-        {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(_loggedInUserModel.Token);           
-            }
         }
     }
 }
