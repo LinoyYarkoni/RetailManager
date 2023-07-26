@@ -22,7 +22,10 @@ namespace RMDesktopUI.ViewModels
 
         public string UserName
 		{
-			get { return _userName; }
+			get
+            { 
+                return _userName; 
+            }
 			set
 			{ 
 				_userName = value;
@@ -33,7 +36,10 @@ namespace RMDesktopUI.ViewModels
 
         public string Password
         {
-            get { return _password; }
+            get
+            { 
+                return _password; 
+            }
             set
             {
                 _password = value;

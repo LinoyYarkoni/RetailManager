@@ -56,7 +56,7 @@ namespace RMDesktopUI.Library.Api
             var data = new { userId, roleName };
 
             using (HttpResponseMessage response
-                = await _apiHelper.ApiClient.PutAsJsonAsync("/api/User/Admin/AddRole", data))
+                = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/AddRole", data))
             {
                 if (response.IsSuccessStatusCode == false)
                 {
@@ -70,7 +70,7 @@ namespace RMDesktopUI.Library.Api
             var data = new { userId, roleName };
 
             using (HttpResponseMessage response
-                = await _apiHelper.ApiClient.PutAsJsonAsync("/api/User/Admin/RemoveRole", data))
+                = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/RemoveRole", data))
             {
                 if (response.IsSuccessStatusCode == false)
                 {
