@@ -1,5 +1,6 @@
 ﻿using DataManager.Library.Internal.DataAccess;
 using DataManager.Library.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,17 @@ namespace DataManager.Library.DataAccess
 {
     public class SaleData
     {
+        private IConfiguration _config;
+
+        public SaleData(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public void SaveSale(SaleModel saleInfo, string cashierId)
         {
             List<SaleDetailDBModel> saleDetailDBModel = new List<SaleDetailDBModel>();
-            ProductData product = new ProductData();
+            ProductData product = new ProductData(_config);
             var taxRate = ConfigHelper.GetTaxRate() / 100;
 
             // Initialize SaleDetail DB model from SaleModel (ProductId, Quantity)
@@ -56,7 +64,7 @@ namespace DataManager.Library.DataAccess
             sale.Total = sale.SubTotal + sale.Tax;
 
             /* Transaction */
-            using(SqlDataAccess sql = new SqlDataAccess())
+            using(SqlDataAccess sql = new SqlDataAccess(_config))
             {
                 try
                 {
@@ -91,7 +99,7 @@ namespace DataManager.Library.DataAccess
 
         public List<SaleReportModel> GetSaleReport()
         {
-            SqlDataAccess sql = new SqlDataAccess();
+            SqlDataAccess sql = new SqlDataAccess(_config);
 
             var output = sql.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "RMData");
 
